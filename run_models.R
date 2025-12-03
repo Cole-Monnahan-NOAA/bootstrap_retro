@@ -21,7 +21,7 @@ Npeels <- 14
 peels <- 0:-Npeels
 
 ## Setup to run parallel, saving a single core free.
-cpus <- parallel::detectCores()-3
+cpus <- parallel::detectCores()-2
 sfStop()
 sfInit( parallel=TRUE, cpus=cpus)
 sfExportAll()
@@ -50,7 +50,7 @@ run_model(reps, model.name='GOA_Pcod_noprior', miller=TRUE)
 ## make sure to delete runs and result files before
 ## rerunning
 ## unlink('runs/GOA_pollock/', recursive=TRUE)
-## run_pollock_boot_iteration(boot=12, datlist=pkdatlist, replist=pkreplist)
+## run_pollock_boot_iteration(boot=0, datlist=pkdatlist, replist=pkreplist)
 run_pollock_model(reps,datlist=pkdatlist, replist=pkreplist,
                   model.name='GOA_pollock', miller=TRUE,
                   clean.files=TRUE)

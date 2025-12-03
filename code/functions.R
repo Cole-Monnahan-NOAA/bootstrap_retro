@@ -253,7 +253,7 @@ run_SS_boot_iteration <- function(boot, model.name,
   write.csv(x=rhos, file=file.path(wd, rhofile), row.names=FALSE)
   if(clean.files){
     unlink(file.path(wd, 'retros'), recursive=TRUE)
-    file.remove(file.path(wd, 'retroSummary.RDS'))
+    ##file.remove(file.path(wd, 'retroSummary.RDS'))
     file.remove(file.path(wd, 'retroModels.RDS'))
     ## trash <-
     ##   file.remove(list.files(file.path(wd), pattern='.exe', full.names=TRUE))

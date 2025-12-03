@@ -27,8 +27,8 @@
 // output.
 
 // This is the final 2022 accepted model adapted slightly for the
-// retro project. It has errors disabled. Selex for survey 6
-// fixed at MLE from full model
+// retro project. It has errors disabled. Selex and q for survey
+// 6 fixed at MLE from full model. 
 
 GLOBALS_SECTION
   // turn of exiting on error
@@ -246,7 +246,8 @@ INITIALIZATION_SECTION
   log_q2_dev         0.0  
   log_q3_mean       -1.6   // Survey 3 catchability
   log_q3_dev         0.0
-  log_q6             0.0   // Survey 6 catchability
+  // hard coded so it doesnt break when peeling back, MLE from 2022 final
+  log_q6             -0.268137242210   // Survey 6 catchability
   
   slp1_fsh_dev       0.0   // Selectivity deviance terms
   inf1_fsh_dev       0.0
@@ -364,6 +365,7 @@ PARAMETER_SECTION
   init_bounded_number inf1_srv6(0,50,-1)
   //    init_bounded_number inf1_srv6(1,50,-1)
   //    init_bounded_number inf1_srv6(1,50,-1)
+  // turned off as noted above
   init_bounded_number log_slp2_srv6(-5,5,-7)
   init_bounded_number inf2_srv6(5,25,-7)
 
@@ -384,7 +386,7 @@ PARAMETER_SECTION
   init_bounded_number log_q5(-10,10,6)
   //  init_bounded_number q5_pow(-10,10,6)  
   init_bounded_number q5_pow(-10,10,-6)
-  init_bounded_number log_q6(-10,10,5)
+  init_bounded_number log_q6(-10,10,-5)
   // This scales M vector below so that M={M}*natMscalar. If 1 does nothing. 
   init_bounded_number natMscalar(0,5,-5)
 
