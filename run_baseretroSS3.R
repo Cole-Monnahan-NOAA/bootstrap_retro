@@ -50,8 +50,8 @@ for(i in 1:length(dirs))
 #Plot time series of SSB with 95% confidence envelopes
   #Read report files and get derived quant and sd
   #Calc 95% confidence envelope
-if (file.exists(here('models',"retro_summarySS3.csv"))) {
-  file.remove(here('models',"retro_summarySS3.csv"))
+if (file.exists(here('results',"retro_summarySS3.csv"))) {
+  file.remove(here('results',"retro_summarySS3.csv"))
 }
 
 
@@ -73,15 +73,15 @@ if (file.exists(here('models',"retro_summarySS3.csv"))) {
                            SSB = as.numeric(Models$replist1$timeseries$SpawnBio[Models$replist1$timeseries$Yr<=Models$replist1$Retro_year]),
                            SSB_stdev = as.numeric(ssb_stdev))
 
-      write.table(mod_op, file=here('models','retro_summarySS3.csv'), append=TRUE, row.names=FALSE, sep=",",
-                  col.names = !file.exists(here('models',"retro_summarySS3.csv")))
+      write.table(mod_op, file=here('results','retro_summarySS3.csv'), append=TRUE, row.names=FALSE, sep=",",
+                  col.names = !file.exists(here('results',"retro_summarySS3.csv")))
     }
 
   }
 #Plot
 colors <- palette.Martin()
 fn <- "retro_summarySS3.csv"
-ssb <- read.csv(here('models',fn),header=TRUE)
+ssb <- read.csv(here('results',fn),header=TRUE)
 
   ssb <- ssb %>% dplyr::filter(year >= 1990) %>%
                  dplyr::filter(year<=2019) %>%
@@ -107,6 +107,7 @@ ssb <- read.csv(here('models',fn),header=TRUE)
       scale_fill_viridis_d(name = "Base year", direction=-1) +
       labs(y='SSB (10,000 mt)', x='Year')
   ggsave(here('retro_timeseries.png'),width = 8, height = 8, units='in')
+
 
 
 

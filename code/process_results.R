@@ -1,6 +1,7 @@
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(r4ss)
 
 message("Set plotting theme...")
 
@@ -63,7 +64,7 @@ results_woodshole <- filter(results, type=='WoodsHole' & boot>0)
 ## boot 0 is special code to run the real data so split this off
 rho_obs <- results %>% filter(boot==0 & type=='AFSC')
 
-results_pk <- list.files('results', pattern='GOA_pollock',
+results_pk <- list.files('results', pattern='GOA_pollock_retros',
                          full.names=TRUE) %>%
   lapply(FUN=function(x) cbind(readRDS(x))) %>%
   dplyr::bind_rows() %>%
