@@ -4,10 +4,11 @@ library(r4ss)
 library(snowfall)
 library(ggplot2)
 library(R2admb)
-## devtools::install_github("afsc-assessments/GOApollock", ref='fix_dat_fns')
+# devtools::install_github("afsc-assessments/GOApollock", ref='fix_dat_fns')
+# devtools::install_github("afsc-assessments/GOApollock", ref='v0.1.0')
 library(GOApollock)
 theme_set(theme_bw())
-packageVersion('r4ss') #  '1.42.0'
+packageVersion('r4ss') #  '1.52.1'
 source('code/functions.R')
 ## GOA pollock is a bespoke model and setup differently
 pkdatlist <- readRDS("models/GOA_pollock/datfile.RDS")
@@ -34,11 +35,14 @@ sfExportAll()
 ### files, to facilitate the Miller sampling scheme.
 
 ## ## Run one in serial as a test
-## test <- run_SS_boot_iteration(1, 'EBS_Pcod', TRUE)
+#test <- run_SS_boot_iteration(44, 'GOA_NRS', clean.files = TRUE, miller = FALSE)
 run_model(reps, model.name='GOA_NRS',clean.files=TRUE)
 run_model(reps, model.name='GOA_NRS',miller=TRUE, clean.files=TRUE)
 
-
+# ff <- list.files('runs/GOA_NRS')
+# ff <- ff[!grepl('miller', ff)]
+# ff <- sapply(ff, \(x) str_split_1(x, "_"))
+# reps = which(!1:500 %in% as.numeric(ff[2,]))
 
 run_model(reps, model.name='EBS_Pcod')
 run_model(reps, model.name='EBS_Pcod', miller=TRUE)

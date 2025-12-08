@@ -209,7 +209,8 @@ run_SS_boot_iteration <- function(boot, model.name,
   ## Run retro for this bootstrap one
   retro(masterdir=getwd(), oldsubdir=wd,
              newsubdir=paste0(wd, '/retros'),
-             years=peels, extras='-nohess -nox -iprint 1000')
+             years=peels, extras='-nohess -nox -iprint 1000',
+        exe = 'ss')
   dirvec <- file.path(paste0(wd, '/retros'), paste0("retro", peels))
   if(length(dirvec)!=Npeels+1)
     stop("Some retro runs missing in", model.name, " iteration ",

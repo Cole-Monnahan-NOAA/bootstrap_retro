@@ -77,17 +77,17 @@ results_pk <- list.files('results', pattern='GOA_pollock_retros',
 rho_obs_pk<- results_pk %>%
   filter(boot==0) %>%
   dplyr::mutate(baseyear=factor(baseyear))
-
+results_pk <- filter(results_pk, boot>0)
 #combine pk with others
 results_afsc <- dplyr::bind_rows(results_afsc,results_pk) %>%
                   dplyr::mutate(model = case_when(model == 'GOA_NRS' ~ 'GOA NRS',
                                                   model == 'GOApollock' ~ 'GOA pollock',
-                                                  model == 'EBS_Pcod3' ~ 'EBS P. cod',
+                                                  model == 'EBS_Pcod' ~ 'EBS P. cod',
                                                   model == 'GOA_Pcod_noprior' ~ 'GOA P. cod'))
 rho_obs <- dplyr::bind_rows(rho_obs,rho_obs_pk)  %>%
                   dplyr::mutate(model = case_when(model == 'GOA_NRS' ~ 'GOA NRS',
                                 model == 'GOApollock' ~ 'GOA pollock',
-                                model == 'EBS_Pcod3' ~ 'EBS P. cod',
+                                model == 'EBS_Pcod' ~ 'EBS P. cod',
                                 model == 'GOA_Pcod_noprior' ~ 'GOA P. cod'))
 
 #Get median and quantile range for terminal year
@@ -178,38 +178,38 @@ lapply(c('SSB', 'Rec', 'F'), function(x){
 
 #results_pk %>% filter(!miller) %>% arrange(desc(abs(rho)))
 
-reps <- readRDS("runs/GOA_pollock/boot_0/retroModels.RDS")
+# reps <- readRDS("runs/GOA_pollock/boot_0/retroModels.RDS")
+#
+# ii <- lapply(c(1,2,3,6), function(i)
+#   cbind(survey=i, mymelt(reps, paste0('Survey_',i,'_expected_index')))) %>%
+#   bind_rows
+# qq <- lapply(c(1,2,3,6), function(i)
+#  cbind(survey=i, mymelt(reps, paste0('Survey_',i,'_q')))) %>%
+#   bind_rows
+#
+# rr <- mymelt(reps, 'Recruits')
+# ggplot(ii, aes(year, value, group=factor(model))) + geom_line() +
+#   facet_wrap('survey') + scale_y_log10()
+#
+# ggplot(qq, aes(year, value, group=factor(model))) + geom_line() +
+#   facet_wrap('survey')
+#
+# ggplot(rr, aes(year, value, color=(model), group=factor(model))) + geom_line()
 
-ii <- lapply(c(1,2,3,6), function(i)
-  cbind(survey=i, mymelt(reps, paste0('Survey_',i,'_expected_index')))) %>%
-  bind_rows
-qq <- lapply(c(1,2,3,6), function(i)
- cbind(survey=i, mymelt(reps, paste0('Survey_',i,'_q')))) %>%
-  bind_rows
-
-rr <- mymelt(reps, 'Recruits')
-ggplot(ii, aes(year, value, group=factor(model))) + geom_line() +
-  facet_wrap('survey') + scale_y_log10()
-
-ggplot(qq, aes(year, value, group=factor(model))) + geom_line() +
-  facet_wrap('survey')
-
-ggplot(rr, aes(year, value, color=(model), group=factor(model))) + geom_line()
-
-
-meltindices <- function(boot) {
-  dd <- read_pk_dat(filename='goa_pk.dat', path=paste0('runs/GOA_pollock/boot_',boot), writedat=TRUE)
-  rbind(with(dd, data.frame(survey=1, year=srvyrs1, index=indxsurv1)),
-        with(dd, data.frame(survey=2, year=srvyrs2, index=indxsurv2)),
-        with(dd, data.frame(survey=3, year=srvyrs3, index=indxsurv3)),
-        with(dd, data.frame(survey=6, year=srvyrs6,
-                            index=indxsurv6))) %>% cbind(boot=boot)
-}
-
-out <- lapply(0:20, meltindices) %>% bind_rows()
-
-ggplot(out, aes(year,index, group=boot, color=factor(boot))) + geom_line() + facet_wrap('survey')
-
+# library(GOApollock)
+# meltindices <- function(boot) {
+#   dd <- read_pk_dat(filename='goa_pk.dat', path=paste0('runs/GOA_pollock/boot_',boot), writedat=TRUE)
+#   rbind(with(dd, data.frame(survey=1, year=srvyrs1, index=indxsurv1)),
+#         with(dd, data.frame(survey=2, year=srvyrs2, index=indxsurv2)),
+#         with(dd, data.frame(survey=3, year=srvyrs3, index=indxsurv3)),
+#         with(dd, data.frame(survey=6, year=srvyrs6,
+#                             index=indxsurv6))) %>% cbind(boot=boot)
+# }
+#
+# out <- lapply(0:20, meltindices) %>% bind_rows()
+#
+# ggplot(out, aes(year,index, group=boot, color=factor(boot))) + geom_line() + facet_wrap('survey')
+#
 
 if(FALSE){
   message("skipping MLE calculations this time")
@@ -222,22 +222,17 @@ if(FALSE){
   par.results <- ff %>% lapply(read.csv) %>% bind_rows()
   ## Only need this b/c of old bugs in get_res function. Delete
   ## next time a full run is done
-  par.results <- par.results %>%  rename(peels=peelsl) %>%
-    select(-miller.1) %>%
+  par.results <- par.results %>%  rename(peels=peels) %>%
+    #select(-miller.1) %>%
     group_by(model, par, assess_yr, peels, miller) %>%
-    mutate(re=(value-value[boot==0])/value[boot==0])
+    mutate(re=(value-value[boot==0])/value[boot==0]) |> ungroup()
   saveRDS(par.results, file='results/par.results.RDS')
 
   ## get timeseries
   ff <- list.files('runs', pattern='ts_res',
                    full.names=TRUE, recursive=TRUE)
   ts.results <- ff %>% lapply(read.csv) %>% bind_rows()
-  str(ts.results)
 
-  ## again old bugs so update as needed later
-  ts.results <- ts.results[,1:8]
-
-  ts.results$model %>% unique
   ## some quick processing, any year after keep_yr has no data so
   ## throw it out
   ts <- ts.results %>%
@@ -257,7 +252,7 @@ if(FALSE){
 
 ## Check for full replicates for an arbitrary base year
 check <- results_afsc %>%
-  filter(metric=='SSB' & baseyear==2012) %>%
+  filter(metric=='SSB' & baseyear==2015) %>%
   group_by(model,miller) %>%
   summarize(count=n(), .groups='drop')
 print(check)

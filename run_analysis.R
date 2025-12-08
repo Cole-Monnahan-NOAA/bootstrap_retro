@@ -9,8 +9,8 @@ library(r4ss)
 library(snowfall)
 library(ggplot2)
 theme_set(theme_bw())
-packageVersion('r4ss') #  '1.42.0'
-R.version              # 3.6.3
+packageVersion('r4ss') #  '1.52.1'
+R.version              # 4.5.1
 source('code/functions.R')           # this has the key functions
 
 ## Note that the models are not on the repo and must be obtained
