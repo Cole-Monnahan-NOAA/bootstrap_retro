@@ -1,8 +1,23 @@
+### Run and compare models
+library(tidyverse)
+library(r4ss)
+library(snowfall)
+library(ggplot2)
+library(R2admb)
+## devtools::install_github("afsc-assessments/GOApollock", ref='fix_dat_fns')
+library(GOApollock)
+theme_set(theme_bw())
+packageVersion('r4ss') #  '1.42.0'
+source('code/functions.R')
+## GOA pollock is a bespoke model and setup differently
+pkdatlist <- readRDS("models/GOA_pollock/datfile.RDS")
+pkreplist <- readRDS("models/GOA_pollock/repfile.RDS")
+source('code/functions_pollock.R')
 
 ## For each boostrap data set, run a retrospective analysis
 Nreps <- 500
 reps <- 0:Nreps # 0 is special code for original data
-Npeels <- 1
+Npeels <- 14
 peels <- 0:-Npeels
 
 ## Setup to run parallel, saving a single core free.
@@ -20,20 +35,26 @@ sfExportAll()
 
 ## ## Run one in serial as a test
 ## test <- run_SS_boot_iteration(1, 'EBS_Pcod', TRUE)
+run_model(reps, model.name='GOA_NRS',clean.files=TRUE)
+run_model(reps, model.name='GOA_NRS',miller=TRUE, clean.files=TRUE)
 
 
-## run_model(reps, model.name='EBS_Pcod')
-## run_model(reps, model.name='EBS_Pcod', miller=TRUE)
-### EBS_Pcod3 is the original model but switched away from the
-## D-M likelhiood. Did this by updating input N for comps in the
-## original data file (based on D-M fit from the bootstrap data)
-## and then switched to the multinomial. See the ebs_comparison
-## folder for what changed when this happened.
-run_model(reps, model.name='EBS_Pcod4')
-run_model(reps, model.name='EBS_Pcod4', miller=TRUE)
+
+run_model(reps, model.name='EBS_Pcod')
+run_model(reps, model.name='EBS_Pcod', miller=TRUE)
 ## run_model(reps, model.name='GOA_Pcod_prior')
 ## run_model(reps, model.name='GOA_Pcod_prior', miller=TRUE)
 run_model(reps, model.name='GOA_Pcod_noprior')
 run_model(reps, model.name='GOA_Pcod_noprior', miller=TRUE)
-run_model(reps, model.name='GOA_NRS')
-run_model(reps, model.name='GOA_NRS', miller=TRUE)
+
+## make sure to delete runs and result files before
+## rerunning
+## unlink('runs/GOA_pollock/', recursive=TRUE)
+## run_pollock_boot_iteration(boot=0, datlist=pkdatlist, replist=pkreplist)
+run_pollock_model(reps,datlist=pkdatlist, replist=pkreplist,
+                  model.name='GOA_pollock', miller=TRUE,
+                  clean.files=TRUE)
+run_pollock_model(reps,datlist=pkdatlist, replist=pkreplist,
+                  model.name='GOA_pollock', miller=FALSE,
+                  clean.files=TRUE)
+

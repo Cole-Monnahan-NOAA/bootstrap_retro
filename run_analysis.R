@@ -8,6 +8,7 @@ library(tidyverse)
 library(r4ss)
 library(snowfall)
 library(ggplot2)
+library(Rmisc)
 theme_set(theme_bw())
 packageVersion('r4ss') #  '1.52.1'
 R.version              # 4.5.1
@@ -30,7 +31,8 @@ str(results_afsc)                       # the main data to use
 
 
 ## Step 4 is to make tables/figures
-source("code/make_plots.R")
+source("code/plotting_code.R")
+#source("code/make_plots.R")
 
 
 ## old code to check if updating EBS_Pcod had a big effect or
