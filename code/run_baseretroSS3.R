@@ -79,9 +79,9 @@ if (file.exists(here('results',"retro_summarySS3.csv"))) {
 
   }
 #Plot
-colors <- palette.Martin()
+
 fn <- "retro_summarySS3.csv"
-ssb <- read.csv(here('results',fn),header=TRUE)
+ssb <- read.csv(here::here('results',fn),header=TRUE)
 
   ssb <- ssb %>% dplyr::filter(year >= 1990) %>%
                  dplyr::filter(year<=2019) %>%
@@ -98,15 +98,15 @@ ssb <- read.csv(here('results',fn),header=TRUE)
   ssb <- ssb %>% dplyr::arrange(desc(peel))
   ssb$base_year <- factor(ssb$base_year, levels = 2019:2007)
 
-  ggplot(data = ssb, aes(x=year, y=SSB, color = factor(base_year))) +
+  ggplot(data = ssb, aes(x=year, y=SSB/1e4, color = factor(base_year))) +
       geom_line() +
-      geom_ribbon(aes(x=year, ymin=lci, ymax=uci, fill=factor(base_year)), alpha=0.15,colour=NA) +
+      geom_ribbon(aes(x=year, ymin=lci/1e4, ymax=uci/1e4, fill=factor(base_year)), alpha=0.3,colour=NA) +
       expand_limits(y=0) +
       facet_wrap(~mod, scales = 'free',ncol=1) +
-      scale_color_viridis_d(name="Base year", direction=-1) +
-      scale_fill_viridis_d(name = "Base year", direction=-1) +
+      scale_color_viridis_d(name="Base year", direction=1, option='inferno') +
+      scale_fill_viridis_d(name = "Base year", direction=1, option='inferno') +
       labs(y='SSB (10,000 mt)', x='Year')
-  ggsave(here('retro_timeseries.png'),width = 8, height = 8, units='in')
+  ggsave(here::here('plots','retro_timeseries.png'),width = 8, height = 8, units='in')
 
 
 

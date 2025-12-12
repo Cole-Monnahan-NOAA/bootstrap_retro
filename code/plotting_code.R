@@ -14,8 +14,8 @@ obs_rho_col <- 'mediumvioletred'#'darkorange2'
 
 ## The models have different end years so the baseyears are
 ## different, but check for full replicates
-results_afsc %>% group_by(model,miller, baseyear) %>%
-  filter(metric=='SSB') %>% summarize(count=n()) %>%
+results_afsc %>% dplyr::group_by(model,miller, baseyear) %>%
+  dplyr::filter(metric=='SSB') %>% dplyr::summarize(count=n()) %>%
   pivot_wider(c(model, miller),  names_from='baseyear', values_from='count')
 
 results_afsc$baseyear=as.numeric(as.character(results_afsc$baseyear))
@@ -128,12 +128,33 @@ lapply(c('SSB', 'Rec', 'F'), function(x){
 
 ts <- readRDS('results/ts.results.RDS')
 
+s <- sample(1:100, 10)
+lapply(s, function(s) {
+  ip<- ts %>% dplyr::filter(boot==s & name == 'ssb' & year >=1990) %>%
+    dplyr::mutate(peel_yr = assess_yr - peel)
+  ip$peel_yr <- factor(ip$peel_yr, levels = rev(sort(unique(ip$peel_yr))))
+
+  term_pd <- ip %>% dplyr::group_by(model, miller, peel) %>%
+    dplyr::filter(year == max(year))
+
+  ggplot(data = ip, aes(x=year, y=value/1e4, color = peel_yr)) +
+    geom_line() +
+    geom_point(data=term_pd, aes(x=year, y=value/1e4, color=peel_yr)) +
+    expand_limits(y=0) +
+    facet_grid(model~miller, scales = 'free') +
+    scale_color_viridis_d(name="Base year", direction=1, option='inferno') +
+    labs(y='SSB (10,000 mt)', x='Year')
+  ggsave(here::here('plots',paste0('retro_timeseries_boot_',s,'.png')),width = 8, height = 8, units='in')
+})
+
+
 ts4 <- ts %>%
   dplyr::filter(boot>0) %>%
   dplyr::group_by(model,year,peel,name,miller) %>%
   dplyr::summarise(x = quantile(re, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975))
 ts5 <- tidyr::spread(ts4,q,x)
 names(ts5)=c(names(ts5[1:5]),'lci','med','uci')
+
 met=sort(unique(ts5$name))
 for(j in 1:length(met))
 {
@@ -143,6 +164,6 @@ for(j in 1:length(met))
     geom_ribbon(aes(ymin=lci,ymax=uci, fill=peel),alpha=0.3)+ facet_grid(miller~model)+
     coord_cartesian(ylim=c(-1,1))+geom_hline(yintercept=0,color="red")+
     ylab(paste("Relative error in ", met[j],sep=" ")) + xlab("Year")
-  ##  ggsave(here::here('plots',paste0('RelError_',met[j],'.png')),units='in',width=8,height=8)
+    ggsave(here::here('plots',paste0('RelError_',met[j],'.png')),units='in',width=8,height=8)
 }
 
