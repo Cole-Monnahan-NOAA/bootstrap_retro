@@ -127,10 +127,13 @@ lapply(c('SSB', 'Rec', 'F'), function(x){
 )
 
 ts <- readRDS('results/ts.results.RDS')
+ts <- ts %>% dplyr::mutate(model = case_when(model == 'EBS_Pcod' ~ 'EBS P. cod',
+                                             model == 'GOA_NRS' ~ 'GOA NRS',
+                                             model == 'GOA_Pcod_noprior' ~ 'GOA P. cod'))
 
 s <- sample(1:100, 10)
 lapply(s, function(s) {
-  ip<- ts %>% dplyr::filter(boot==s & name == 'ssb' & year >=1990) %>%
+  ip<- ts %>% dplyr::filter(boot==s & name == 'ssb' & keep_yr>=2008 & keep_yr<=2015) %>%
     dplyr::mutate(peel_yr = assess_yr - peel)
   ip$peel_yr <- factor(ip$peel_yr, levels = rev(sort(unique(ip$peel_yr))))
 

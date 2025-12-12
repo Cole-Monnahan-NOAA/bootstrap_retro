@@ -3,18 +3,6 @@ library(tidyr)
 library(ggplot2)
 library(r4ss)
 
-message("Set plotting theme...")
-
-old_par <- par("mar")
-par(mar=c(1.5,1.5,1,1))
-par("mar")
-#Set plotting theme
-old_theme=theme_set(theme_bw())
-theme_set(theme_bw()+theme(text = element_text(size=14),
-                           axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)))
-model_colors <- c('navyblue', 'gold')
-obs_rho_col <- 'mediumvioletred'#'darkorange2'
-
 message("Processing GOA pollock results: rhos, time series and par estimates...")
 ## Read in all final results, including those not necessarily
 ## in reps since they could have been run earlier
@@ -178,7 +166,7 @@ if(FALSE){
 
 ## Check for full replicates for an arbitrary base year
 check <- results_afsc %>%
-  filter(metric=='SSB' & baseyear==2015) %>%
-  group_by(model,miller) %>%
-  summarize(count=n(), .groups='drop')
+  dplyr::filter(metric=='SSB' & baseyear==2015) %>%
+  dplyr::group_by(model,miller) %>%
+  dplyr::summarize(count=n(), .groups='drop')
 print(check)
